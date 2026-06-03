@@ -30,6 +30,6 @@ export const tagsSep = Object.entries(tags).map(
 
 export const prefix = "trustgraph-" + environment;
 
-export const nodeType = "ecs.g6.xlarge";
+export const nodeType = "ecs.g7.xlarge";
 export const nodeCount = 3;
 export const diskSize = 40;
