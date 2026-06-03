@@ -33,7 +33,7 @@ export const cluster = new alicloud.cs.ManagedKubernetes(
         podCidr: "192.168.0.0/16",
         serviceCidr: "172.16.0.0/16",
         newNatGateway: true,
-        clusterSpec: "ack.pro.small",
+        clusterSpec: "ack.standard",
         deletionProtection: false,
     },
     {
