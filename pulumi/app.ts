@@ -6,6 +6,9 @@ import * as random from '@pulumi/random';
 
 import { k8sProvider } from './k8s-provider';
 
+const cfg = new pulumi.Config();
+const dashscopeApiKey = cfg.requireSecret("dashscope-api-key");
+
 export const iamBootstrapToken = new random.RandomPassword(
     "iam-bootstrap-token",
     {
@@ -43,6 +46,21 @@ const iamSecret = new k8s.core.v1.Secret(
         },
         stringData: {
             "token": pulumi.interpolate`tg_${iamBootstrapToken.result}`,
+        },
+    },
+    { provider: k8sProvider, dependsOn: appDeploy }
+);
+
+const aiSecret = new k8s.core.v1.Secret(
+    "openai-secret",
+    {
+        metadata: {
+            name: "openai-credentials",
+            namespace: "trustgraph"
+        },
+        stringData: {
+            "openai-token": dashscopeApiKey,
+            "openai-url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
         },
     },
     { provider: k8sProvider, dependsOn: appDeploy }

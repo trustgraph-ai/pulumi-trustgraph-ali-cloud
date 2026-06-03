@@ -526,34 +526,31 @@ items:
       {"description": "bge-large-en-v1.5", "id": "BAAI/bge-large-en-v1.5"}, {"description":
       "gte-large", "id": "thenlper/gte-large"}, {"description": "multilingual-e5-large",
       "id": "intfloat/multilingual-e5-large"}], "required": true, "type": "string"},
-      "llm-model": {"default": "gemini-2.5-flash-lite", "description": "LLM model
-      to use", "enum": [{"description": "Gemini 3 Pro (preview)", "id": "gemini-3-pro-preview"},
-      {"description": "Gemini 3 Flash (preview)", "id": "gemini-3-flash-preview"},
-      {"description": "Gemini 2.5 Pro", "id": "gemini-2.5-pro"}, {"description": "Gemini
-      2.5 Flash", "id": "gemini-2.5-flash"}, {"description": "Gemini 2.5 Flash Lite",
-      "id": "gemini-2.5-flash-lite"}, {"description": "Gemini 2.0 Flash", "id": "gemini-2.0-flash-001"},
-      {"description": "Gemini 2.0 Flash Lite", "id": "gemini-2.0-flash-lite-001"},
-      {"description": "Gemma 3 27B", "id": "gemma-3-27b"}, {"description": "Gemma
-      3n E4B", "id": "gemma-3n-e4b"}, {"description": "Claude Opus 4.6", "id": "claude-opus-4-6"},
-      {"description": "Claude Opus 4.5", "id": "claude-opus-4-5"}, {"description":
-      "Claude Sonnet 4.5", "id": "claude-sonnet-4-5"}, {"description": "Claude Haiku
-      4.5", "id": "claude-haiku-4-5"}, {"description": "Claude Opus 4.1", "id": "claude-opus-4-1"},
-      {"description": "Claude Sonnet 4", "id": "claude-sonnet-4"}], "required": true,
-      "type": "string"}, "llm-temperature": {"default": 0.3, "description": "LLM temperature",
-      "helper": "A floating point number between 0 and 1", "max": 10, "min": 0, "placeholder":
-      0.3, "required": true, "type": "float"}}, "prompt": {"system": "You are a helpful
-      assistant.", "template-index": ["agent-kg-extract", "agent-react", "diagnose-csv",
-      "diagnose-json", "diagnose-structured-data", "diagnose-xml", "document-prompt",
-      "extract-concepts", "extract-definitions", "extract-relationships", "extract-rows",
-      "extract-topics", "extract-with-ontologies", "graphql-generation", "kg-edge-reasoning",
-      "kg-edge-scoring", "kg-prompt", "kg-synthesis", "pattern-select", "plan-create",
-      "plan-step-execute", "plan-synthesise", "question", "schema-selection", "supervisor-decompose",
-      "supervisor-synthesise", "task-type-classify"], "template.agent-kg-extract":
-      {"object-schema": {"oneOf": [{"properties": {"definition": {"type": "string"},
-      "entity": {"type": "string"}, "type": {"const": "definition"}}, "required":
-      ["type", "entity", "definition"], "type": "object"}, {"properties": {"object":
-      {"type": "string"}, "object-entity": {"type": "boolean"}, "predicate": {"type":
-      "string"}, "subject": {"type": "string"}, "type": {"const": "relationship"}},
+      "llm-model": {"default": "gpt-5.2", "description": "LLM model to use", "enum":
+      [{"description": "GPT-5.2 Pro (maximum intelligence, slow)", "id": "gpt-5.2-pro"},
+      {"description": "GPT-5.2 (flagship, best general-purpose)", "id": "gpt-5.2"},
+      {"description": "GPT-5.2 Codex (optimized for agentic coding)", "id": "gpt-5.2-codex"},
+      {"description": "GPT-5.1 (previous flagship)", "id": "gpt-5.1"}, {"description":
+      "GPT-5 (previous gen reasoning)", "id": "gpt-5"}, {"description": "GPT-4.1 (coding
+      + long context, 1M tokens)", "id": "gpt-4.1"}, {"description": "GPT-4.1 Mini
+      (fast + affordable)", "id": "gpt-4.1-mini"}, {"description": "GPT-4.1 Nano (ultra-fast,
+      cheapest)", "id": "gpt-4.1-nano"}, {"description": "GPT-4o (legacy multimodal)",
+      "id": "gpt-4o"}, {"description": "GPT-4o Mini (legacy, budget)", "id": "gpt-4o-mini"}],
+      "required": true, "type": "string"}, "llm-temperature": {"default": 0.3, "description":
+      "LLM temperature", "helper": "A floating point number between 0 and 1", "max":
+      10, "min": 0, "placeholder": 0.3, "required": true, "type": "float"}}, "prompt":
+      {"system": "You are a helpful assistant.", "template-index": ["agent-kg-extract",
+      "agent-react", "diagnose-csv", "diagnose-json", "diagnose-structured-data",
+      "diagnose-xml", "document-prompt", "extract-concepts", "extract-definitions",
+      "extract-relationships", "extract-rows", "extract-topics", "extract-with-ontologies",
+      "graphql-generation", "kg-edge-reasoning", "kg-edge-scoring", "kg-prompt", "kg-synthesis",
+      "pattern-select", "plan-create", "plan-step-execute", "plan-synthesise", "question",
+      "schema-selection", "supervisor-decompose", "supervisor-synthesise", "task-type-classify"],
+      "template.agent-kg-extract": {"object-schema": {"oneOf": [{"properties": {"definition":
+      {"type": "string"}, "entity": {"type": "string"}, "type": {"const": "definition"}},
+      "required": ["type", "entity", "definition"], "type": "object"}, {"properties":
+      {"object": {"type": "string"}, "object-entity": {"type": "boolean"}, "predicate":
+      {"type": "string"}, "subject": {"type": "string"}, "type": {"const": "relationship"}},
       "required": ["type", "subject", "predicate", "object"], "type": "object"}]},
       "prompt": "Analyze the following text and extract both entity definitions and
       relationships.\n\nFor definitions, extract entities and their explanations or
@@ -3241,15 +3238,14 @@ items:
       app: rows
 - apiVersion: v1
   data:
-    launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.model.text_completion.vertexai.Processor\"\
+    launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.model.text_completion.openai.Processor\"\
       \n  \"params\":\n    \"concurrency\": 1\n    \"id\": \"text-completion\"\n \
-      \   \"max_output_tokens\": 8192\n    \"private_key\": \"/vertexai/private.json\"\
-      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
-      \n    \"region\": \"us-central1\"\n    \"temperature\": 0\n- \"class\": \"trustgraph.model.text_completion.vertexai.Processor\"\
-      \n  \"params\":\n    \"concurrency\": 1\n    \"id\": \"text-completion-rag\"\
-      \n    \"max_output_tokens\": 8192\n    \"private_key\": \"/vertexai/private.json\"\
-      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
-      \n    \"region\": \"us-central1\"\n    \"temperature\": 0"
+      \   \"max_output_tokens\": 4096\n    \"pubsub_backend\": \"pulsar\"\n    \"\
+      pulsar_host\": \"pulsar://pulsar:6650\"\n    \"temperature\": 0\n- \"class\"\
+      : \"trustgraph.model.text_completion.openai.Processor\"\n  \"params\":\n   \
+      \ \"concurrency\": 1\n    \"id\": \"text-completion-rag\"\n    \"max_output_tokens\"\
+      : 4096\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
+      \n    \"temperature\": 0"
   kind: ConfigMap
   metadata:
     name: text-completion-launch-cfg
@@ -3278,28 +3274,34 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-vertexai:2.5.11
+          env:
+          - name: OPENAI_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: openai-token
+                name: openai-credentials
+          - name: OPENAI_BASE_URL
+            valueFrom:
+              secretKeyRef:
+                key: openai-url
+                name: openai-credentials
+          image: docker.io/trustgraph/trustgraph-flow:2.5.11
           name: text-completion
           resources:
             limits:
               cpu: '0.5'
-              memory: 256M
+              memory: 128M
             requests:
               cpu: '0.1'
-              memory: 256M
+              memory: 128M
           volumeMounts:
           - mountPath: /etc/trustgraph/
             name: text-completion-launch-cfg
-          - mountPath: /vertexai
-            name: vertexai-creds
         enableServiceLinks: false
         volumes:
         - configMap:
             name: text-completion-launch-cfg
           name: text-completion-launch-cfg
-        - name: vertexai-creds
-          secret:
-            secretName: vertexai-creds
 - apiVersion: v1
   kind: Service
   metadata:

@@ -160,5 +160,5 @@ Just say yes.
 ## How the config was built
 
 ```
-./update-config gcp-k8s 2.5.11
+./update-config ack-k8s 2.5.11
 ```

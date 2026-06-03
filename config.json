@@ -28,9 +28,9 @@
         "parameters": {}
     },
     {
-        "name": "vertexai",
+        "name": "openai",
         "parameters": {
-            "max-output-tokens": 8192
+            "max-output-tokens": 4096
         }
     },
     {
