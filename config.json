@@ -42,7 +42,7 @@
             "models": {
                 "type": "string",
                 "description": "LLM model to use",
-                "default": "qwen-plus",
+                "default": "qwen-turbo",
                 "enum": [
                     {
                         "id": "qwen-plus",
