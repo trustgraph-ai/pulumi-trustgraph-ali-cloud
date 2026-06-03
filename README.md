@@ -80,6 +80,20 @@ Or use the Alibaba Cloud CLI:
 aliyun configure
 ```
 
+## DashScope API Key
+
+An API key is needed for the AI model (Qwen via DashScope).  To create one:
+- Go to the Alibaba Cloud console
+- Navigate to Model Studio
+- Click **API Key**
+- Click **Create API Key**
+
+Then set the key in Pulumi config (encrypted):
+
+```
+pulumi config set --secret trustgraph-ack:dashscope-api-key YOUR_API_KEY
+```
+
 ## Modify the local configuration to do what you want
 
 You can edit:
