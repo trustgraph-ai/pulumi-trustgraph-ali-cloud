@@ -1,0 +1,3 @@
+name: trustgraph-ack
+description: Trustgraph deployment on Alibaba Cloud
+runtime: nodejs
