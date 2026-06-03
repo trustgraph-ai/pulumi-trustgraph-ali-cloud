@@ -29,7 +29,7 @@ export const cluster = new alicloud.cs.ManagedKubernetes(
     "cluster",
     {
         name: prefix,
-        workerVswitchIds: [vswitch.id],
+        vswitchIds: [vswitch.id],
         podVswitchIds: [vswitch.id],
         serviceCidr: "172.16.0.0/16",
         newNatGateway: true,
@@ -48,7 +48,7 @@ export const nodePool = new alicloud.cs.NodePool(
         clusterId: cluster.id,
         vswitchIds: [vswitch.id],
         instanceTypes: [nodeType],
-        desiredSize: nodeCount,
+        desiredSize: nodeCount.toString(),
         systemDiskCategory: "cloud_essd",
         systemDiskSize: diskSize,
     },
