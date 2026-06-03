@@ -30,6 +30,9 @@ export const iamToken = pulumi.interpolate`tg_${iamBootstrapToken.result}`;
 
 export const grafanaPassword = grafanaAdminPassword.result;
 
+export const apiServerInternet = cluster.connections.apiServerInternet;
+export const apiServerIntranet = cluster.connections.apiServerIntranet;
+
 // --------------------------------------------------------------------------
 
 // Have to reference these things here so that they get deployed

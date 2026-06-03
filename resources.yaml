@@ -1770,7 +1770,7 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 20G
+        storage: 20Gi
     storageClassName: tg
 - apiVersion: v1
   data:
@@ -2580,7 +2580,7 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 20G
+        storage: 20Gi
     storageClassName: tg
 - apiVersion: apps/v1
   kind: Deployment
@@ -2684,7 +2684,7 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 20G
+        storage: 20Gi
     storageClassName: tg
 - apiVersion: apps/v1
   kind: Deployment
@@ -2765,7 +2765,7 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 20G
+        storage: 20Gi
     storageClassName: tg
 - apiVersion: apps/v1
   kind: Deployment
@@ -3029,7 +3029,7 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 20G
+        storage: 20Gi
     storageClassName: tg
 - apiVersion: apps/v1
   kind: Deployment
