@@ -20,6 +20,14 @@
         "parameters": {}
     },
     {
+        "name": "garage",
+        "parameters": {}
+    },
+    {
+        "name": "cassandra",
+        "parameters": {}
+    },
+    {
         "name": "trustgraph-base",
         "parameters": {}
     },
@@ -30,7 +38,27 @@
     {
         "name": "openai",
         "parameters": {
-            "max-output-tokens": 4096
+            "max-output-tokens": 4096,
+            "models": {
+                "type": "string",
+                "description": "LLM model to use",
+                "default": "qwen-plus",
+                "enum": [
+                    {
+                        "id": "qwen-plus",
+                        "description": "Qwen Plus"
+                    },
+                    {
+                        "id": "qwen-turbo",
+                        "description": "Qwen Turbo"
+                    },
+                    {
+                        "id": "qwen-max",
+                        "description": "Qwen Max"
+                    }
+                ],
+                "required": true
+            }
         }
     },
     {

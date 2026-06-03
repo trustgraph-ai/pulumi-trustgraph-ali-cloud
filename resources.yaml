@@ -84,12 +84,83 @@ items:
     selector:
       app: api-gateway
 - apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: cassandra
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: tg
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: cassandra
+    name: cassandra
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: cassandra
+    template:
+      metadata:
+        labels:
+          app: cassandra
+      spec:
+        containers:
+        - env:
+          - name: JVM_OPTS
+            value: -Xms700M -Xmx700M -Dcassandra.skip_wait_for_gossip_to_settle=0
+          image: docker.io/cassandra:5.0.8
+          name: cassandra
+          ports:
+          - containerPort: 9042
+            hostPort: 9042
+          resources:
+            limits:
+              cpu: '1.0'
+              memory: 1400M
+            requests:
+              cpu: '0.5'
+              memory: 1400M
+          volumeMounts:
+          - mountPath: /var/lib/cassandra
+            name: cassandra
+        enableServiceLinks: false
+        securityContext:
+          fsGroup: 999
+        volumes:
+        - name: cassandra
+          persistentVolumeClaim:
+            claimName: cassandra
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: cassandra
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: api
+      port: 9042
+      targetPort: 9042
+    selector:
+      app: cassandra
+- apiVersion: v1
   data:
     launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.librarian.Processor\"\
-      \n  \"params\":\n    \"id\": \"librarian\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.config.service.Processor\"\
-      \n  \"params\":\n    \"id\": \"config-svc\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.flow.service.Processor\"\
+      \n  \"params\":\n    \"id\": \"librarian\"\n    \"object_store_access_key\"\
+      : \"GK000000000000000000000001\"\n    \"object_store_endpoint\": \"garage:3900\"\
+      \n    \"object_store_region\": \"garage\"\n    \"object_store_secret_key\":\
+      \ \"b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427\"\n   \
+      \ \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
+      \n- \"class\": \"trustgraph.config.service.Processor\"\n  \"params\":\n    \"\
+      id\": \"config-svc\"\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\"\
+      : \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.flow.service.Processor\"\
       \n  \"params\":\n    \"id\": \"flow-svc\"\n    \"pubsub_backend\": \"pulsar\"\
       \n    \"pulsar_admin_url\": \"http://pulsar:8080\"\n    \"pulsar_host\": \"\
       pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.cores.service.Processor\"\n\
@@ -526,17 +597,10 @@ items:
       {"description": "bge-large-en-v1.5", "id": "BAAI/bge-large-en-v1.5"}, {"description":
       "gte-large", "id": "thenlper/gte-large"}, {"description": "multilingual-e5-large",
       "id": "intfloat/multilingual-e5-large"}], "required": true, "type": "string"},
-      "llm-model": {"default": "gpt-5.2", "description": "LLM model to use", "enum":
-      [{"description": "GPT-5.2 Pro (maximum intelligence, slow)", "id": "gpt-5.2-pro"},
-      {"description": "GPT-5.2 (flagship, best general-purpose)", "id": "gpt-5.2"},
-      {"description": "GPT-5.2 Codex (optimized for agentic coding)", "id": "gpt-5.2-codex"},
-      {"description": "GPT-5.1 (previous flagship)", "id": "gpt-5.1"}, {"description":
-      "GPT-5 (previous gen reasoning)", "id": "gpt-5"}, {"description": "GPT-4.1 (coding
-      + long context, 1M tokens)", "id": "gpt-4.1"}, {"description": "GPT-4.1 Mini
-      (fast + affordable)", "id": "gpt-4.1-mini"}, {"description": "GPT-4.1 Nano (ultra-fast,
-      cheapest)", "id": "gpt-4.1-nano"}, {"description": "GPT-4o (legacy multimodal)",
-      "id": "gpt-4o"}, {"description": "GPT-4o Mini (legacy, budget)", "id": "gpt-4o-mini"}],
-      "required": true, "type": "string"}, "llm-temperature": {"default": 0.3, "description":
+      "llm-model": {"default": "qwen-plus", "description": "LLM model to use", "enum":
+      [{"description": "Qwen Plus", "id": "qwen-plus"}, {"description": "Qwen Turbo",
+      "id": "qwen-turbo"}, {"description": "Qwen Max", "id": "qwen-max"}], "required":
+      true, "type": "string"}, "llm-temperature": {"default": 0.3, "description":
       "LLM temperature", "helper": "A floating point number between 0 and 1", "max":
       10, "min": 0, "placeholder": 0.3, "required": true, "type": "float"}}, "prompt":
       {"system": "You are a helpful assistant.", "template-index": ["agent-kg-extract",
@@ -1760,6 +1824,281 @@ items:
       targetPort: 8000
     selector:
       app: embeddings
+- apiVersion: v1
+  data:
+    garage.toml: 'metadata_dir = "/var/lib/garage/meta"
+
+      data_dir = "/var/lib/garage/data"
+
+
+      db_engine = "lmdb"
+
+
+      replication_factor = 1
+
+
+      compression_level = 1
+
+
+      rpc_bind_addr = "[::]:3901"
+
+      rpc_public_addr = "[::]:3901"
+
+      rpc_secret = "bbba746a9e289bad64a9e7a36a4299dac8d6e0b8cc2a6c2937fe756df4492008"
+
+
+      [s3_api]
+
+      s3_region = "garage"
+
+      api_bind_addr = "[::]:3900"
+
+      root_domain = ".s3.garage.local"
+
+
+      [s3_web]
+
+      bind_addr = "[::]:3902"
+
+      root_domain = ".web.garage.local"
+
+      index = "index.html"
+
+
+      [k2v_api]
+
+      api_bind_addr = "[::]:3904"
+
+
+      [admin]
+
+      api_bind_addr = "[::]:3903"
+
+      admin_token = "batts-rockhearted-unpartially"
+
+      '
+  kind: ConfigMap
+  metadata:
+    name: garage-cfg
+    namespace: trustgraph
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: garage-meta
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: tg
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: garage-data
+    namespace: trustgraph
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: tg
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: garage
+    name: garage
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: garage
+    template:
+      metadata:
+        labels:
+          app: garage
+      spec:
+        containers:
+        - command:
+          - /garage
+          - -c
+          - /etc/garage/garage.toml
+          - server
+          env:
+          - name: RUST_LOG
+            value: garage=info
+          image: docker.io/dxflrs/garage:v2.3.0
+          name: garage
+          ports:
+          - containerPort: 3900
+            hostPort: 3900
+          - containerPort: 3901
+            hostPort: 3901
+          - containerPort: 3902
+            hostPort: 3902
+          - containerPort: 3903
+            hostPort: 3903
+          - containerPort: 3904
+            hostPort: 3904
+          resources:
+            limits:
+              cpu: '1.0'
+              memory: 512M
+            requests:
+              cpu: '0.5'
+              memory: 512M
+          volumeMounts:
+          - mountPath: /etc/garage/
+            name: garage-cfg
+          - mountPath: /var/lib/garage/meta
+            name: garage-meta
+          - mountPath: /var/lib/garage/data
+            name: garage-data
+        enableServiceLinks: false
+        securityContext:
+          fsGroup: 1000
+        volumes:
+        - configMap:
+            name: garage-cfg
+          name: garage-cfg
+        - name: garage-meta
+          persistentVolumeClaim:
+            claimName: garage-meta
+        - name: garage-data
+          persistentVolumeClaim:
+            claimName: garage-data
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: garage-init
+    name: garage-init
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: garage-init
+    template:
+      metadata:
+        labels:
+          app: garage-init
+      spec:
+        containers:
+        - command:
+          - sh
+          - -c
+          - "set -e\n\n# Install required tools\necho \"Installing curl, jq and downloading\
+            \ garage CLI...\"\napk add --no-cache curl jq\n\n# Download garage binary\
+            \ (v2.1.0) for remote management\ncurl -fsSL \"https://garagehq.deuxfleurs.fr/_releases/v2.1.0/x86_64-unknown-linux-musl/garage\"\
+            \ \\\n    -o /usr/local/bin/garage\nchmod +x /usr/local/bin/garage\n\n\
+            echo \"Waiting for Garage daemon to be ready...\"\nMAX_ATTEMPTS=60\nATTEMPT=0\n\
+            # Wait for /health to respond (even 503 is fine - means daemon is up)\n\
+            until curl -s http://garage:3903/health >/dev/null 2>&1; do\n    ATTEMPT=$((ATTEMPT+1))\n\
+            \    if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then\n        echo \"ERROR: Garage\
+            \ failed to become ready after ${MAX_ATTEMPTS} attempts\"\n        exit\
+            \ 1\n    fi\n    echo \"Attempt ${ATTEMPT}/${MAX_ATTEMPTS}: Garage not\
+            \ ready, retrying in 2s...\"\n    sleep 2\ndone\necho \"Garage daemon\
+            \ is ready.\"\n\n# Get the node ID via v2 Admin API\necho \"Getting Garage\
+            \ node ID via Admin API...\"\ncurl -s -H \"Authorization: Bearer ${GARAGE_ADMIN_TOKEN}\"\
+            \ \\\n    \"http://garage:3903/v2/GetNodeInfo?node=self\" > /tmp/garage-node-info.json\n\
+            \n# Extract node ID from response (the key in success map is the node\
+            \ ID)\nNODE_ID=$(jq -r '.success | to_entries[0].value.nodeId' /tmp/garage-node-info.json)\n\
+            echo \"Node ID: ${NODE_ID}\"\n\nif [ -z \"$NODE_ID\" ] || [ \"$NODE_ID\"\
+            \ = \"null\" ]; then\n    echo \"ERROR: Failed to retrieve node ID\"\n\
+            \    exit 1\nfi\n\n# ===== LAYOUT MANAGEMENT VIA REMOTE RPC =====\n# Use\
+            \ garage CLI with -h and -s flags to connect remotely\n# -h requires format:\
+            \ <node-id>@<host>:<port>\n# -s provides the RPC secret\n\n# Construct\
+            \ full RPC identifier\nRPC_HOST=\"${NODE_ID}@garage:3901\"\necho \"RPC\
+            \ Host: ${RPC_HOST}\"\n\n# Check current layout to see if node is already\
+            \ assigned (idempotent)\necho \"Checking current cluster layout...\"\n\
+            LAYOUT_OUTPUT=$(garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\"\
+            \ layout show 2>&1)\n\n# Check if node already has a role assigned\n#\
+            \ Layout output shows abbreviated node ID (first 16 chars)\nNODE_ID_SHORT=\"\
+            ${NODE_ID:0:16}\"\nif echo \"$LAYOUT_OUTPUT\" | grep -q \"$NODE_ID_SHORT\"\
+            ; then\n    echo \"Node ${NODE_ID_SHORT}... already assigned in layout,\
+            \ skipping.\"\nelse\n    echo \"Assigning node to cluster layout...\"\n\
+            \    # Assign node to zone dc1 with configured capacity\n    garage -h\
+            \ \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n        layout assign\
+            \ ${NODE_ID} -z dc1 -c ${GARAGE_DATA_SIZE}\n\n    echo \"Applying layout\
+            \ configuration...\"\n    # Get current staged version and apply\n   \
+            \ garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n        layout\
+            \ apply --version 1\n\n    echo \"Layout configured successfully.\"\n\
+            \    # Wait for layout to stabilize\n    sleep 5\nfi\n\n# ===== KEY MANAGEMENT\
+            \ VIA REMOTE RPC =====\n\n# Check if key already exists (idempotent)\n\
+            # GARAGE_ACCESS_KEY is already a valid Garage Key ID (GK + 24 hex chars)\n\
+            if garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" key info \"${GARAGE_ACCESS_KEY}\"\
+            \ >/dev/null 2>&1; then\n    echo \"Access key ${GARAGE_ACCESS_KEY} already\
+            \ exists, skipping creation.\"\nelse\n    echo \"Importing S3 access key:\
+            \ ${GARAGE_ACCESS_KEY}\"\n\n    # Import key with the provided credentials\
+            \ (both already in valid Garage format)\n    # GARAGE_ACCESS_KEY = Key\
+            \ ID (GK + 24 hex chars)\n    # GARAGE_SECRET_KEY = Secret (64 hex chars)\n\
+            \    garage -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n      \
+            \  key import \"${GARAGE_ACCESS_KEY}\" \"${GARAGE_SECRET_KEY}\" --yes\n\
+            \n    echo \"Access key imported successfully.\"\nfi\n\n# Grant permissions\
+            \ to the key\necho \"Granting create-bucket permission to key...\"\ngarage\
+            \ -h \"${RPC_HOST}\" -s \"${GARAGE_RPC_SECRET}\" \\\n    key allow --create-bucket\
+            \ \"${GARAGE_ACCESS_KEY}\"\n\necho \"\"\necho \"Garage initialization\
+            \ complete!\"\necho \"S3 Endpoint: http://garage:3900\"\necho \"Region:\
+            \ ${GARAGE_REGION}\"\nexit 0\n"
+          env:
+          - name: GARAGE_ACCESS_KEY
+            value: GK000000000000000000000001
+          - name: GARAGE_ADMIN_TOKEN
+            value: batts-rockhearted-unpartially
+          - name: GARAGE_DATA_SIZE
+            value: 5G
+          - name: GARAGE_REGION
+            value: garage
+          - name: GARAGE_RPC_SECRET
+            value: bbba746a9e289bad64a9e7a36a4299dac8d6e0b8cc2a6c2937fe756df4492008
+          - name: GARAGE_SECRET_KEY
+            value: b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427
+          image: docker.io/alpine:3.23.2
+          name: garage-init
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 256M
+            requests:
+              cpu: '0.25'
+              memory: 128M
+          volumeMounts:
+          - mountPath: /etc/garage/
+            name: garage-cfg
+        enableServiceLinks: false
+        volumes:
+        - configMap:
+            name: garage-cfg
+          name: garage-cfg
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: garage
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: s3-api
+      port: 3900
+      targetPort: 3900
+    - name: rpc
+      port: 3901
+      targetPort: 3901
+    - name: web
+      port: 3902
+      targetPort: 3902
+    - name: admin
+      port: 3903
+      targetPort: 3903
+    - name: k2v
+      port: 3904
+      targetPort: 3904
+    selector:
+      app: garage
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
