@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
+        "ignoreDeprecations": "6.0",
         "outDir": "bin",
         "target": "es2016",
         "module": "commonjs",
@@ -12,7 +13,12 @@
         "noImplicitReturns": true,
         "forceConsistentCasingInFileNames": true
     },
-    "files": [
-        "index.ts"
+    "include": [
+        "*.ts",
+        "__tests__/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "bin"
     ]
 }

@@ -12,6 +12,7 @@ The full stack includes:
 - An ACK managed Kubernetes cluster
 - Node pool containing 3 nodes
 - Deploys a complete TrustGraph stack of resources in ACK
+- HTTPS gateway with TLS via Let's Encrypt for TrustGraph UI and Grafana
 
 Keys and other configuration for the AI components are configured into
 TrustGraph using secrets.
@@ -30,6 +31,7 @@ Roadmap to deploy is:
 - Configure your environment with Alibaba Cloud credentials
 - Modify the local configuration to do what you want
 - Deploy
+- Point DNS at the gateway load balancer
 - Use the system
 
 # Deploy
@@ -108,6 +110,9 @@ The `Pulumi.STACKNAME.yaml` configuration file contains settings for:
   trustgraph-ack:environment: dev
   trustgraph-ack:region: cn-hangzhou
   trustgraph-ack:zone: cn-hangzhou-h
+  trustgraph-ack:domain: ali1.dev.trustgraph.ai
+  trustgraph-ack:grafana-domain: grafana.ali1.dev.trustgraph.ai
+  trustgraph-ack:letsencrypt-email: admin@trustgraph.ai
 ```
 
 ## Deploy
@@ -121,6 +126,7 @@ Just say yes.
 If everything works:
 - A file `kube.cfg` will also be created which provides access
   to the Kubernetes cluster.
+- An HTTPS gateway with TLS certificates will be provisioned.
 
 To connect to the Kubernetes cluster...
 
@@ -132,19 +138,45 @@ If something goes wrong while deploying, retry before giving up.
 `pulumi up` is a retryable command and will continue from
 where it left off.
 
+### Gateway and DNS Configuration
+
+After deployment, get the gateway load balancer IP:
+
+```
+pulumi stack output gatewayIp
+```
+
+Alternatively, you can find it in the Alibaba Cloud console:
+**Products and Services** → **Networking & CDN** → **Server Load
+Balancer** → **CLB** → **Instances**. You will see two load balancers —
+ignore the one named `ManagedK8SSlbIntranet` (that is the Kubernetes
+internal load balancer). The other one with a public IP address is the
+gateway load balancer.
+
+Point your DNS records at this IP:
+
+- `domain` (e.g., ali1.dev.trustgraph.ai) → Load balancer IP
+- `grafana-domain` (e.g., grafana.ali1.dev.trustgraph.ai) → Load balancer IP
+
+Once DNS propagates, Let's Encrypt will automatically issue TLS certificates
+via the HTTP-01 challenge.
+
 ## Use the system
 
-To get access to TrustGraph using the `kube.cfg` file, set up some
-port-forwarding.  You'll need multiple terminal windows to run each of
-these commands:
+Once DNS is configured, access the services directly via HTTPS:
+
+- TrustGraph UI: https://your-domain
+- Grafana: https://your-grafana-domain
+
+For local access without DNS, use port-forwarding:
 
 ```
 kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/api-gateway 8088:8088
-kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/workbench-ui 8888:8888
+kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/trustgraph-ui 8888:8888
 kubectl --kubeconfig kube.cfg -n trustgraph port-forward service/grafana 3000:3000
 ```
 
-This will allow you to access Grafana and the Workbench UI from your local
+This will allow you to access Grafana and the TrustGraph UI from your local
 browser using `http://localhost:3000` and `http://localhost:8888`
 respectively.
 
@@ -174,5 +206,5 @@ Just say yes.
 ## How the config was built
 
 ```
-./update-config ack-k8s 2.5.11
+./update-config ack-k8s 2.5.16
 ```

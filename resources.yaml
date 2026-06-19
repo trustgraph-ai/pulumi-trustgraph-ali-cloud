@@ -45,7 +45,7 @@ items:
           - '8088'
           - --log-level
           - INFO
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: api-gateway
           ports:
           - containerPort: 8088
@@ -115,7 +115,7 @@ items:
         containers:
         - env:
           - name: JVM_OPTS
-            value: -Xms700M -Xmx700M -Dcassandra.skip_wait_for_gossip_to_settle=0
+            value: -Xms500M -Xmx500M -Dcassandra.skip_wait_for_gossip_to_settle=0
           image: docker.io/cassandra:5.0.8
           name: cassandra
           ports:
@@ -124,10 +124,10 @@ items:
           resources:
             limits:
               cpu: '1.0'
-              memory: 1400M
+              memory: 2000M
             requests:
               cpu: '0.5'
-              memory: 1400M
+              memory: 2000M
           volumeMounts:
           - mountPath: /var/lib/cassandra
             name: cassandra
@@ -153,31 +153,34 @@ items:
 - apiVersion: v1
   data:
     launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.librarian.Processor\"\
-      \n  \"params\":\n    \"id\": \"librarian\"\n    \"object_store_access_key\"\
-      : \"GK000000000000000000000001\"\n    \"object_store_endpoint\": \"garage:3900\"\
-      \n    \"object_store_region\": \"garage\"\n    \"object_store_secret_key\":\
-      \ \"b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427\"\n   \
+      \n  \"params\":\n    \"cassandra_replication_factor\": 1\n    \"id\": \"librarian\"\
+      \n    \"object_store_access_key\": \"GK000000000000000000000001\"\n    \"object_store_endpoint\"\
+      : \"garage:3900\"\n    \"object_store_region\": \"garage\"\n    \"object_store_secret_key\"\
+      : \"b171f00be9be4c32c734f4c05fe64c527a8ab5eb823b376cfa8c2531f70fc427\"\n   \
       \ \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
       \n- \"class\": \"trustgraph.config.service.Processor\"\n  \"params\":\n    \"\
-      id\": \"config-svc\"\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\"\
-      : \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.flow.service.Processor\"\
-      \n  \"params\":\n    \"id\": \"flow-svc\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_admin_url\": \"http://pulsar:8080\"\n    \"pulsar_host\": \"\
-      pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.cores.service.Processor\"\n\
-      \  \"params\":\n    \"id\": \"knowledge\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.storage.knowledge.store.Processor\"\
-      \n  \"params\":\n    \"id\": \"kg-store\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.metering.Processor\"\
-      \n  \"params\":\n    \"id\": \"metering\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.metering.Processor\"\
-      \n  \"params\":\n    \"id\": \"metering-rag\"\n    \"pubsub_backend\": \"pulsar\"\
-      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.iam.service.Processor\"\
-      \n  \"params\":\n    \"bootstrap_mode\": \"token\"\n    \"id\": \"iam-svc\"\n\
-      \    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
-      \n- \"class\": \"trustgraph.bootstrap.bootstrapper.Processor\"\n  \"params\"\
-      :\n    \"id\": \"bootstrap\"\n    \"initialisers\":\n    - \"class\": \"trustgraph.bootstrap.initialisers.PulsarTopology\"\
-      \n      \"flag\": \"v1\"\n      \"name\": \"pulsar-topology\"\n      \"params\"\
-      :\n        \"admin_url\": \"http://pulsar:8080\"\n    - \"class\": \"trustgraph.bootstrap.initialisers.TemplateSeed\"\
+      cassandra_replication_factor\": 1\n    \"id\": \"config-svc\"\n    \"pubsub_backend\"\
+      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"\
+      trustgraph.flow.service.Processor\"\n  \"params\":\n    \"id\": \"flow-svc\"\
+      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_admin_url\": \"http://pulsar:8080\"\
+      \n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.cores.service.Processor\"\
+      \n  \"params\":\n    \"cassandra_replication_factor\": 1\n    \"id\": \"knowledge\"\
+      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
+      \n- \"class\": \"trustgraph.storage.knowledge.store.Processor\"\n  \"params\"\
+      :\n    \"cassandra_replication_factor\": 1\n    \"id\": \"kg-store\"\n    \"\
+      pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n\
+      - \"class\": \"trustgraph.metering.Processor\"\n  \"params\":\n    \"id\": \"\
+      metering\"\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
+      \n- \"class\": \"trustgraph.metering.Processor\"\n  \"params\":\n    \"id\"\
+      : \"metering-rag\"\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\"\
+      : \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.iam.service.Processor\"\
+      \n  \"params\":\n    \"bootstrap_mode\": \"token\"\n    \"cassandra_replication_factor\"\
+      : 1\n    \"id\": \"iam-svc\"\n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\"\
+      : \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.bootstrap.bootstrapper.Processor\"\
+      \n  \"params\":\n    \"id\": \"bootstrap\"\n    \"initialisers\":\n    - \"\
+      class\": \"trustgraph.bootstrap.initialisers.PulsarTopology\"\n      \"flag\"\
+      : \"v1\"\n      \"name\": \"pulsar-topology\"\n      \"params\":\n        \"\
+      admin_url\": \"http://pulsar:8080\"\n    - \"class\": \"trustgraph.bootstrap.initialisers.TemplateSeed\"\
       \n      \"flag\": \"v1\"\n      \"name\": \"template-seed\"\n      \"params\"\
       :\n        \"config_file\": \"/etc/trustgraph/template/config.json\"\n     \
       \   \"overwrite\": false\n    - \"class\": \"trustgraph.bootstrap.initialisers.WorkspaceInit\"\
@@ -1628,7 +1631,7 @@ items:
               secretKeyRef:
                 key: token
                 name: iam-bootstrap-token
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: control
           resources:
             limits:
@@ -1732,15 +1735,15 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - INFO
-          image: docker.io/trustgraph/trustgraph-unstructured:2.5.11
+          image: docker.io/trustgraph/trustgraph-unstructured:2.5.16
           name: document-decoder
           resources:
             limits:
               cpu: '0.5'
-              memory: 512M
+              memory: 1400M
             requests:
               cpu: '0.1'
-              memory: 512M
+              memory: 1400M
         enableServiceLinks: false
         volumes: []
 - apiVersion: v1
@@ -1795,7 +1798,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: embeddings
           resources:
             limits:
@@ -2865,7 +2868,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: ingest
           resources:
             limits:
@@ -2978,6 +2981,54 @@ items:
       targetPort: 3100
     selector:
       app: loki
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      app: mcp-server
+    name: mcp-server
+    namespace: trustgraph
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: mcp-server
+    template:
+      metadata:
+        labels:
+          app: mcp-server
+      spec:
+        containers:
+        - command:
+          - mcp-server
+          - --port
+          - '8000'
+          image: docker.io/trustgraph/trustgraph-mcp:2.5.16
+          name: mcp-server
+          ports:
+          - containerPort: 8000
+            hostPort: 8000
+          resources:
+            limits:
+              cpu: '0.5'
+              memory: 256M
+            requests:
+              cpu: '0.1'
+              memory: 256M
+        enableServiceLinks: false
+        volumes: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: mcp-server
+    namespace: trustgraph
+  spec:
+    ports:
+    - name: mcp
+      port: 8000
+      targetPort: 8000
+    selector:
+      app: mcp-server
 - apiVersion: v1
   data:
     prometheus.yml: "global:\n\n  scrape_interval:     15s # By default, scrape targets\
@@ -3481,7 +3532,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: rag
           resources:
             limits:
@@ -3513,11 +3564,12 @@ items:
 - apiVersion: v1
   data:
     launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.query.rows.cassandra.Processor\"\
-      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"id\": \"rows-query\"\
-      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
-      \n- \"class\": \"trustgraph.storage.rows.cassandra.Processor\"\n  \"params\"\
-      :\n    \"cassandra_host\": \"cassandra\"\n    \"id\": \"rows-write\"\n    \"\
-      pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\""
+      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"cassandra_replication_factor\"\
+      : 1\n    \"id\": \"rows-query\"\n    \"pubsub_backend\": \"pulsar\"\n    \"\
+      pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.storage.rows.cassandra.Processor\"\
+      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"cassandra_replication_factor\"\
+      : 1\n    \"id\": \"rows-write\"\n    \"pubsub_backend\": \"pulsar\"\n    \"\
+      pulsar_host\": \"pulsar://pulsar:6650\""
   kind: ConfigMap
   metadata:
     name: rows-launch-cfg
@@ -3546,15 +3598,15 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: rows
           resources:
             limits:
               cpu: '0.5'
-              memory: 512M
+              memory: 768M
             requests:
               cpu: '0.1'
-              memory: 512M
+              memory: 768M
           volumeMounts:
           - mountPath: /etc/trustgraph/
             name: rows-launch-cfg
@@ -3624,7 +3676,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: text-completion
           resources:
             limits:
@@ -3656,11 +3708,12 @@ items:
 - apiVersion: v1
   data:
     launch.yaml: "\"processors\":\n- \"class\": \"trustgraph.query.triples.cassandra.Processor\"\
-      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"id\": \"triples-query\"\
-      \n    \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\
-      \n- \"class\": \"trustgraph.storage.triples.cassandra.Processor\"\n  \"params\"\
-      :\n    \"cassandra_host\": \"cassandra\"\n    \"id\": \"triples-write\"\n  \
-      \  \"pubsub_backend\": \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\""
+      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"cassandra_replication_factor\"\
+      : 1\n    \"id\": \"triples-query\"\n    \"pubsub_backend\": \"pulsar\"\n   \
+      \ \"pulsar_host\": \"pulsar://pulsar:6650\"\n- \"class\": \"trustgraph.storage.triples.cassandra.Processor\"\
+      \n  \"params\":\n    \"cassandra_host\": \"cassandra\"\n    \"cassandra_replication_factor\"\
+      : 1\n    \"id\": \"triples-write\"\n    \"pubsub_backend\": \"pulsar\"\n   \
+      \ \"pulsar_host\": \"pulsar://pulsar:6650\""
   kind: ConfigMap
   metadata:
     name: triples-launch-cfg
@@ -3689,7 +3742,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: triples
           resources:
             limits:
@@ -3736,7 +3789,7 @@ items:
           app: trustgraph-ui
       spec:
         containers:
-        - image: docker.io/trustgraph/trustgraph-ui:0.2.0
+        - image: docker.io/trustgraph/trustgraph-ui:0.2.7
           name: trustgraph-ui
           ports:
           - containerPort: 8888
@@ -3769,20 +3822,22 @@ items:
       : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
       : \"http://qdrant:6333\"\n- \"class\": \"trustgraph.storage.doc_embeddings.qdrant.Processor\"\
       \n  \"params\":\n    \"id\": \"doc-embeddings-write\"\n    \"pubsub_backend\"\
-      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
-      : \"http://qdrant:6333\"\n- \"class\": \"trustgraph.query.graph_embeddings.qdrant.Processor\"\
-      \n  \"params\":\n    \"id\": \"graph-embeddings-query\"\n    \"pubsub_backend\"\
-      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
-      : \"http://qdrant:6333\"\n- \"class\": \"trustgraph.storage.graph_embeddings.qdrant.Processor\"\
+      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"qdrant_replication_factor\"\
+      : 1\n    \"qdrant_shard_number\": 1\n    \"store_uri\": \"http://qdrant:6333\"\
+      \n- \"class\": \"trustgraph.query.graph_embeddings.qdrant.Processor\"\n  \"\
+      params\":\n    \"id\": \"graph-embeddings-query\"\n    \"pubsub_backend\": \"\
+      pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\":\
+      \ \"http://qdrant:6333\"\n- \"class\": \"trustgraph.storage.graph_embeddings.qdrant.Processor\"\
       \n  \"params\":\n    \"id\": \"graph-embeddings-write\"\n    \"pubsub_backend\"\
-      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
-      : \"http://qdrant:6333\"\n- \"class\": \"trustgraph.query.row_embeddings.qdrant.Processor\"\
-      \n  \"params\":\n    \"id\": \"row-embeddings-query\"\n    \"pubsub_backend\"\
-      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
-      : \"http://qdrant:6333\"\n- \"class\": \"trustgraph.storage.row_embeddings.qdrant.Processor\"\
-      \n  \"params\":\n    \"id\": \"row-embeddings-write\"\n    \"pubsub_backend\"\
-      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\"\
-      : \"http://qdrant:6333\""
+      : \"pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"qdrant_replication_factor\"\
+      : 1\n    \"qdrant_shard_number\": 1\n    \"store_uri\": \"http://qdrant:6333\"\
+      \n- \"class\": \"trustgraph.query.row_embeddings.qdrant.Processor\"\n  \"params\"\
+      :\n    \"id\": \"row-embeddings-query\"\n    \"pubsub_backend\": \"pulsar\"\n\
+      \    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"store_uri\": \"http://qdrant:6333\"\
+      \n- \"class\": \"trustgraph.storage.row_embeddings.qdrant.Processor\"\n  \"\
+      params\":\n    \"id\": \"row-embeddings-write\"\n    \"pubsub_backend\": \"\
+      pulsar\"\n    \"pulsar_host\": \"pulsar://pulsar:6650\"\n    \"qdrant_replication_factor\"\
+      : 1\n    \"qdrant_shard_number\": 1\n    \"store_uri\": \"http://qdrant:6333\""
   kind: ConfigMap
   metadata:
     name: vector-store-cfg
@@ -3811,7 +3866,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.11
+          image: docker.io/trustgraph/trustgraph-flow:2.5.16
           name: vector-store
           resources:
             limits:

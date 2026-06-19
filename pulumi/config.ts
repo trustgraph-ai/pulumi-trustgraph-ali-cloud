@@ -8,8 +8,7 @@ function get(tag : string) {
     let val = cfg.get(tag);
 
     if (!val) {
-        console.log("ERROR: The '" + tag + "' config is mandatory");
-        throw "The '" + tag + "' config is mandatory";
+        throw new Error("The '" + tag + "' config is mandatory");
     }
 
     return val;
@@ -33,3 +32,8 @@ export const prefix = "trustgraph-" + environment;
 export const nodeType = "ecs.g9i.xlarge";
 export const nodeCount = 3;
 export const diskSize = 40;
+
+// Gateway configuration
+export const domain = get("domain");
+export const grafanaDomain = get("grafana-domain");
+export const letsencryptEmail = get("letsencrypt-email");

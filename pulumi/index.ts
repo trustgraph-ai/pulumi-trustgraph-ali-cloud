@@ -5,6 +5,7 @@ import * as pulumi from '@pulumi/pulumi';
 import { cluster } from './cluster';
 import { kubeconfig } from './kubeconfig';
 import { appDeploy, iamBootstrapToken, grafanaAdminPassword } from './app';
+import { gatewayIp } from './gateway';
 
 // --------------------------------------------------------------------------
 
@@ -32,6 +33,8 @@ export const grafanaPassword = grafanaAdminPassword.result;
 
 export const apiServerInternet = cluster.connections.apiServerInternet;
 export const apiServerIntranet = cluster.connections.apiServerIntranet;
+
+export { gatewayIp };
 
 // --------------------------------------------------------------------------
 
