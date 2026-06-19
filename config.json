@@ -32,6 +32,10 @@
         "parameters": {}
     },
     {
+        "name": "mcp-server",
+        "parameters": {}
+    },
+    {
         "name": "embeddings-fastembed",
         "parameters": {}
     },

@@ -4,4 +4,7 @@ config:
   trustgraph-ack:region: ap-southeast-1
   trustgraph-ack:zone: ap-southeast-1a
   trustgraph-ack:dashscope-api-key:
-    secure: v1:pxjK3D2Pibz1uE70:r9nA5G8iiP7ITNmN2S6fos7bZSM1rO6LUw+tJYZWssVI
+    secure: v1:g13mI0VV1lkJyCJ9:aGVsbG8gd29ybGQK
+  trustgraph-ack:domain: ali.dev.example.org
+  trustgraph-ack:grafana-domain: grafana.ali1.dev.example.org
+  trustgraph-ack:letsencrypt-email: admin@example.org
