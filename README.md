@@ -206,5 +206,5 @@ Just say yes.
 ## How the config was built
 
 ```
-./update-config ack-k8s 2.5.16
+./update-config ack-k8s 2.6.2
 ```

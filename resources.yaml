@@ -45,7 +45,7 @@ items:
           - '8088'
           - --log-level
           - INFO
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: api-gateway
           ports:
           - containerPort: 8088
@@ -1631,15 +1631,15 @@ items:
               secretKeyRef:
                 key: token
                 name: iam-bootstrap-token
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: control
           resources:
             limits:
               cpu: '0.5'
-              memory: 256M
+              memory: 1024M
             requests:
               cpu: '0.1'
-              memory: 256M
+              memory: 1024M
           volumeMounts:
           - mountPath: /etc/trustgraph/launch/
             name: control-launch-cfg
@@ -1735,15 +1735,15 @@ items:
           - pulsar://pulsar:6650
           - --log-level
           - INFO
-          image: docker.io/trustgraph/trustgraph-unstructured:2.5.16
+          image: docker.io/trustgraph/trustgraph-unstructured:2.6.2
           name: document-decoder
           resources:
             limits:
               cpu: '0.5'
-              memory: 1400M
+              memory: 1500M
             requests:
               cpu: '0.1'
-              memory: 1400M
+              memory: 1500M
         enableServiceLinks: false
         volumes: []
 - apiVersion: v1
@@ -1798,15 +1798,15 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: embeddings
           resources:
             limits:
               cpu: '4.0'
-              memory: 640M
+              memory: 1500M
             requests:
               cpu: '0.5'
-              memory: 640M
+              memory: 1500M
           volumeMounts:
           - mountPath: /etc/trustgraph/
             name: embeddings-launch-cfg
@@ -2780,10 +2780,10 @@ items:
           resources:
             limits:
               cpu: '1.0'
-              memory: 256M
+              memory: 512M
             requests:
               cpu: '0.5'
-              memory: 256M
+              memory: 512M
           volumeMounts:
           - mountPath: /var/lib/grafana
             name: grafana-storage
@@ -2868,7 +2868,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: ingest
           resources:
             limits:
@@ -3003,7 +3003,7 @@ items:
           - mcp-server
           - --port
           - '8000'
-          image: docker.io/trustgraph/trustgraph-mcp:2.5.16
+          image: docker.io/trustgraph/trustgraph-mcp:2.6.2
           name: mcp-server
           ports:
           - containerPort: 8000
@@ -3102,10 +3102,10 @@ items:
           resources:
             limits:
               cpu: '0.5'
-              memory: 128M
+              memory: 512M
             requests:
               cpu: '0.1'
-              memory: 128M
+              memory: 512M
           volumeMounts:
           - mountPath: /etc/prometheus/
             name: prometheus-cfg
@@ -3532,7 +3532,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: rag
           resources:
             limits:
@@ -3598,7 +3598,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: rows
           resources:
             limits:
@@ -3676,7 +3676,7 @@ items:
               secretKeyRef:
                 key: openai-url
                 name: openai-credentials
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: text-completion
           resources:
             limits:
@@ -3742,7 +3742,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: triples
           resources:
             limits:
@@ -3866,7 +3866,7 @@ items:
           - INFO
           - -c
           - /etc/trustgraph/launch.yaml
-          image: docker.io/trustgraph/trustgraph-flow:2.5.16
+          image: docker.io/trustgraph/trustgraph-flow:2.6.2
           name: vector-store
           resources:
             limits:

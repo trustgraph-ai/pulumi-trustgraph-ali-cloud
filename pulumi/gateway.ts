@@ -5,18 +5,6 @@ import { domain, grafanaDomain } from './config';
 import { letsEncryptIssuer } from './cert-manager';
 import { appDeploy } from './app';
 
-// ---------- Gateway API CRDs ----------
-
-const gatewayCrds = new k8s.yaml.v2.ConfigGroup(
-    "gateway-api-crds",
-    {
-        files: [
-            "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml",
-        ],
-    },
-    { provider: k8sProvider }
-);
-
 // ---------- Nginx Gateway Fabric ----------
 
 const ngfNamespace = new k8s.core.v1.Namespace(
@@ -39,7 +27,7 @@ const nginxGatewayFabric = new k8s.helm.v4.Chart(
             },
         },
     },
-    { provider: k8sProvider, dependsOn: [ngfNamespace, gatewayCrds] }
+    { provider: k8sProvider, dependsOn: [ngfNamespace] }
 );
 
 const ngfServiceId = nginxGatewayFabric.resources.apply(
